@@ -1,7 +1,4 @@
-# Easy_Save_Format
- Format .esf
-
-<b>How to use guide:</b>
+# How to use guide:
        
 
 <b>string path = ".../save2.esf";</b>
