@@ -1,35 +1,59 @@
-# Easy_Save_Format
- Format .esf
-
-       How to use guide:
+# How to use guide:
        
 
-  		    string path = ".../save2.esf";
+<b>string path = ".../save2.esf";</b>
 
+-------------------------------------------------------
+<i>// create file or load it</i>
 
-        // create file or load it
-        EsfFile file = new EsfFile(path);
+<b>EsfFile file = new EsfFile(path);</b>
+
+-------------------------------------------------------
+<i>// get an array from file</i>
+
+<b>char[] chars = file.GetArray<char>("currency");</b>
+ 
+ -------------------------------------------------------
         
-        // get an array from file
-        char[] chars = file.GetArray<char>("currency");
+<i>// get a value from file</i>
+
+<b>string text = file.GetValue<string>("text");</b>
+ 
+<b>int id = file.GetValue<int>("id");</b>
+ 
+<b>bool state = file.GetValue<bool>("state");</b>
+ 
+-------------------------------------------------------
         
-        // get a text from file
-        string text = file.GetValue<string>("text");
+<i>// set or add value (key, value)</i>
+
+<b>file.SetValue("health", 75);</b>
+
+<b>file.SetValue("time", 15.57f);</b>
+
+-------------------------------------------------------
         
-        // set or add value (key, value)
-        file.SetValue("health", 75);
-        file.SetValue("time", 15.57f);
+<i>// remove value (key)</i>
+
+<b>file.RemoveValue("money");</b>
+
+-------------------------------------------------------
         
-        // remove value (key)
-        file.RemoveValue("money");
+<i>//save changes to file</i>
+
+<b>file.Write(path);</b>
+
+-------------------------------------------------------
         
-        //save changes to file
-        file.Write(path);
         
+<i>// delete save file</i>
+
+<b>file.Delete(path);</b>
+
+-------------------------------------------------------
         
-        // delete save file
-        file.Delete(path);
-        
-        // to save original file structure (comments, spaces and so on) or not
-        // if false - it's faster
-        file.SaveOriginalStructure = false;
+<i>// to save original file structure (comments, spaces and so on) or not</i>
+
+<i>// if false - it's faster</i>
+
+<b>file.SaveOriginalStructure = false;</b>
