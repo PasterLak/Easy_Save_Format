@@ -120,7 +120,7 @@ public sealed class EsfFile
 
         if (_dictionary.Keys.Count == 0 && !_dictionary.ContainsKey(key))
         {
-            return (T[])(object)null;
+            return new T[0];
         }
 
         return ReadMassive<T>(_dictionary[key]);
