@@ -1,18 +1,14 @@
-// dqwd
-# wfewf
-MAIN
-money = 55
-health = 148
-power = 15
-opened = True
-POSITIONS
-posX = 12.51
-posY = 6.25
-PosZ = 125.4
-nick = my nick name
-bla bla
-
-euro = 7.6
-dollar = $
-data = [True,False,True]
-text = [I, love, you baby!]
+// Comment
+data = [ 7,34,8,5,0,98,12]
+states = [True, False, True,true]
+// POSITION
+posX = -3.2
+posY = 37.06
+posZ = 19.94
+// OTHER
+text = it's a small text!
+text2 = it's another text
+currency = [₴,$,€,₽]
+health = 75
+time = 15.57
+# Comment
