@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
 
 public sealed class EsfFile
 {
-    private Dictionary<string, string> dictionary = new Dictionary<string, string>();
+    private Dictionary<string, string> _dictionary = new Dictionary<string, string>();
+    private List<string> _addedKeys = new List<string>();
 
-    private List<string> addedKeys = new List<string>();
-
-    public bool SaveOriginalStructure = true;
+    public bool SaveOriginalStructure { get; set; }
 
     public EsfFile()
     {
@@ -18,27 +16,28 @@ public sealed class EsfFile
 
     public EsfFile(Dictionary<string, string> dictionary)
     {
-        this.dictionary = dictionary;
+        _dictionary = dictionary;
     }
 
     public EsfFile(string path)
     {
         Read(path);
-
     }
 
     public void SetValue<T>(string key, T value) where T : IConvertible
     {
-        if (dictionary.Keys.Count == 0) return;
 
-        if (dictionary.ContainsKey(key))
+        if (_dictionary.Keys.Count == 0) return;
+
+        if (_dictionary.ContainsKey(key))
         {
-            if(!value.GetType().IsArray)
-            dictionary[key] = value.ToString();
+            if (!value.GetType().IsArray)
+            {
+                _dictionary[key] = value.ToString();
+            }
             else
             {
-
-                dictionary[key] = MassiveToText((IConvertible[])(object)value);
+                _dictionary[key] = MassiveToText((IConvertible[])(object)value);
             }
         }
         else
@@ -48,15 +47,14 @@ public sealed class EsfFile
 
     }
 
-    public void SetValue<T>(string key, T[] value) 
+    public void SetValue<T>(string key, T[] value)
     {
-        if (dictionary.Keys.Count == 0) return;
 
-        if (dictionary.ContainsKey(key))
+        if (_dictionary.Keys.Count == 0) return;
+
+        if (_dictionary.ContainsKey(key))
         {
-           
-            dictionary[key] = MassiveToText(value);
-            
+            _dictionary[key] = MassiveToText(value);
         }
         else
         {
@@ -68,32 +66,29 @@ public sealed class EsfFile
     private void AddValue<T>(string key, T value) where T : IConvertible
     {
 
-        if (!dictionary.ContainsKey(key))
+        if (!_dictionary.ContainsKey(key))
         {
-          
-                dictionary.Add(key, value.ToString());
-                addedKeys.Add(key);
+            _dictionary.Add(key, value.ToString());
+            _addedKeys.Add(key);
         }
         else
         {
-            Debug.LogError(key + " already exist!");
+            Console.WriteLine(key + " already exist!");
         }
-     
+
     }
 
     private void AddValue<T>(string key, T[] value)
     {
 
-        if (!dictionary.ContainsKey(key))
+        if (!_dictionary.ContainsKey(key))
         {
-         
-               dictionary.Add(key, MassiveToText(value));
-               addedKeys.Add(key);
-            
+            _dictionary.Add(key, MassiveToText(value));
+            _addedKeys.Add(key);
         }
         else
         {
-            Debug.LogError(key + " already exist!");
+            Console.WriteLine(key + " already exist!");
         }
 
     }
@@ -101,88 +96,93 @@ public sealed class EsfFile
     public void RemoveValue(string key)
     {
 
-        if (dictionary.ContainsKey(key))
+        if (_dictionary.ContainsKey(key))
         {
-            dictionary.Remove(key);
-           
+            _dictionary.Remove(key);
         }
 
     }
 
     public T GetValue<T>(string key) where T : IConvertible
     {
-        if (dictionary.Keys.Count == 0 & !dictionary.ContainsKey(key))
-            return (T)(object)null;
 
-        return (T)Convert.ChangeType(dictionary[key], typeof(T));
+        if (_dictionary.Keys.Count == 0 & !_dictionary.ContainsKey(key))
+        {
+            return (T)(object)null;
+        }
+
+        return (T)Convert.ChangeType(_dictionary[key], typeof(T));
 
     }
 
     public T[] GetArray<T>(string key) where T : IConvertible
     {
-        if (dictionary.Keys.Count == 0 && !dictionary.ContainsKey(key))
+
+        if (_dictionary.Keys.Count == 0 && !_dictionary.ContainsKey(key))
+        {
             return (T[])(object)null;
+        }
 
-        return ReadMassive<T>(dictionary[key]);
-
+        return ReadMassive<T>(_dictionary[key]);
 
     }
 
     public void GetValue<T>(string key, out T value)
     {
+
         value = (T)(object)null;
 
-        if (dictionary.Keys.Count == 0 && !dictionary.ContainsKey(key))
+        if (_dictionary.Keys.Count == 0 && !_dictionary.ContainsKey(key))
             return;
 
-        value = (T)Convert.ChangeType(dictionary[key], typeof(T));
+        value = (T)Convert.ChangeType(_dictionary[key], typeof(T));
 
     }
 
     public void GetValue<T>(string key, out T[] array) where T : IConvertible
     {
+
         array = null;
 
-        if (dictionary.Keys.Count == 0) return;
-        
-        if(dictionary.ContainsKey(key))
-            array = ReadMassive<T>(dictionary[key]);
+        if (_dictionary.Keys.Count == 0) return;
+
+        if (_dictionary.ContainsKey(key))
+        {
+            array = ReadMassive<T>(_dictionary[key]);
+        }
 
     }
 
     public void Write(string path)
     {
 
-
         if (SaveOriginalStructure == false)
         {
             List<string> line = new List<string>();
 
-            foreach (string key in dictionary.Keys)
+            foreach (string key in _dictionary.Keys)
             {
-                line.Add(key + " = " + dictionary[key]);
+                line.Add(key + " = " + _dictionary[key]);
             }
 
             File.WriteAllLines(path, line.ToArray());
 
-            addedKeys.Clear();
+            _addedKeys.Clear();
 
             return;
         }
 
-        
-        string[] lines = new string[0];
-        List<string> linesUpdated = new List<string>();
 
+        string[] lines = new string[0];
         List<string> newLines = new List<string>();
         List<string> keys = new List<string>();
 
         if (File.Exists(path))
         {
             lines = File.ReadAllLines(path);
-           
+
         }
- 
+
 
         for (int i = 0; i < lines.Length; i++)
         {
@@ -190,12 +190,11 @@ public sealed class EsfFile
             {
                 keys.Add(key);
 
-                if (dictionary.ContainsKey(key) == true)
+                if (_dictionary.ContainsKey(key) == true)
                 {
 
-                    string value = dictionary[key];
+                    string value = _dictionary[key];
 
-                    //linesUpdated.Add(key + " = " + value);
                     lines[i] = key + " = " + value;
                 }
 
@@ -204,32 +203,35 @@ public sealed class EsfFile
 
         if (File.Exists(path))
             File.WriteAllLines(path, lines);
-        else File.Create(path).Close();
+        else
+            File.Create(path).Close();
 
-        if (addedKeys.Count > 0)
+        if (_addedKeys.Count > 0)
         {
 
-            for (int i = 0; i < addedKeys.Count; i++)
+            for (int i = 0; i < _addedKeys.Count; i++)
             {
-                if (!keys.Contains(addedKeys[i]))
+                if (!keys.Contains(_addedKeys[i]))
                 {
-                  
-                    newLines.Add(addedKeys[i] + " = " + dictionary[addedKeys[i]] );
+
+                    newLines.Add(_addedKeys[i] + " = " + _dictionary[_addedKeys[i]]);
 
                 }
             }
 
-            addedKeys.Clear();
+            _addedKeys.Clear();
 
         }
 
         if (newLines.Count > 0)
-        File.AppendAllLines(path, newLines.ToArray());
+        {
+            File.AppendAllLines(path, newLines.ToArray());
+        }
     }
 
     public void Delete(string path)
     {
-        if(File.Exists(path))
+        if (File.Exists(path))
         {
             File.Delete(path);
         }
@@ -239,29 +241,28 @@ public sealed class EsfFile
     {
         if (File.Exists(path))
         {
-            
+
             string[] lines = File.ReadAllLines(path);
 
             foreach (string line in lines)
             {
-                if(TryReadLine(line, out string key, out string value))
+                if (TryReadLine(line, out string key, out string value))
                 {
-                    
-                    if(dictionary.ContainsKey(key) == false)
+
+                    if (_dictionary.ContainsKey(key) == false)
                     {
-                        
-                        dictionary.Add(key, value);
+                        _dictionary.Add(key, value);
                     }
-                    
 
                 }
             }
         }
-        
+
     }
 
     private string MassiveToText<T>(T[] array)
     {
+
         string value = "[";
 
         if (array == null) return "ERROR";
@@ -275,10 +276,12 @@ public sealed class EsfFile
         value += "]";
 
         return value;
+
     }
 
     private bool TryReadLine(string line, out string key, out string value)
     {
+
         key = "";
         value = "";
 
@@ -296,24 +299,30 @@ public sealed class EsfFile
 
             parts[1] = parts[1].Trim(' ');
 
-            if(parts[1][0] == '"' & parts[1][parts[1].Length - 1] == '"')
-             parts[1] = parts[1].Substring(1, parts[1].Length - 2);
+            if (parts[1][0] == '"' & parts[1][parts[1].Length - 1] == '"')
+                parts[1] = parts[1].Substring(1, parts[1].Length - 2);
 
             value = parts[1];
+
             return true;
 
         }
 
         return false;
+
     }
 
     private T[] ReadMassive<T>(string value) where T : IConvertible
     {
+
         string[] data;
         T[] num;
 
         if (typeof(T) != typeof(string))
-        value = value.Replace(" ", string.Empty);
+        {
+            value = value.Replace(" ", string.Empty);
+        }
+
         value = value.Replace("[", string.Empty);
         value = value.Replace(",]", string.Empty);
         value = value.Replace("]", string.Empty);
@@ -326,11 +335,12 @@ public sealed class EsfFile
             if (data[i] != string.Empty)
                 num[i] = (T)Convert.ChangeType(data[i], typeof(T));
             else
-                Debug.LogError("Empty string!");
+                Console.WriteLine("Empty string!");
         }
-       
+
         return num;
-        
+
     }
-   
+
+
 }
