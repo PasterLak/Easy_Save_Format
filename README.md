@@ -15,9 +15,11 @@
 
 <b>char[] chars = file.GetArray<char>("currency");</b>
         
-<i>// get a text from file</i>
+<i>// get a value from file</i>
 
 <b>string text = file.GetValue<string>("text");</b>
+<b>int id = file.GetValue<int>("id");</b>
+<b>bool state = file.GetValue<bool>("state");</b>
         
 <i>// set or add value (key, value)</i>
 
