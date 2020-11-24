@@ -1,7 +1,8 @@
 # Easy_Save_Format
  Format .esf
 
-
+       How to use guide:
+       
 
   		    string path = ".../save2.esf";
 
@@ -15,7 +16,7 @@
         // get a text from file
         string text = file.GetValue<string>("text");
         
-        // set value (key, value)
+        // set or add value (key, value)
         file.SetValue("health", 75);
         file.SetValue("time", 15.57f);
         
@@ -24,3 +25,11 @@
         
         //save changes to file
         file.Write(path);
+        
+        
+        // delete save file
+        file.Delete(path);
+        
+        // to save original file structure (comments, spaces and so on) or not
+        // if false - it's faster
+        file.SaveOriginalStructure = false;
